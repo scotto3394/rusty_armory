@@ -1,0 +1,14 @@
+[package]
+name = "gearing"
+version = "0.1.0"
+authors = ["Scott Manifold <shm.qed@gmail.com>"]
+
+[lib]
+name = "gearlib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "testbins"
+path = "src/main.rs"
+
+[dependencies]
