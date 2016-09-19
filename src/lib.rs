@@ -8,76 +8,161 @@ mod tests {
 
 #[allow(dead_code)]
 pub mod structure {
-
-    #[derive(Default)]
-    struct Player<'a> {
+//===========================================================================================
+// pub structs
+//===========================================================================================
+    #[derive(Default, Debug)]
+    pub struct Player {
         name : String,
-        toons: Vec<&'a mut Toon<'a>>,
+        pub toons: Vec<Box<Toon>>,
     }
 
-    struct Toon<'a> {
+    #[derive(Default, Debug)]
+    pub struct Toon {
         name  : String,
-        player: &'a Player<'a>,
         level : i32,
-        class : String,
-        roles : Vec<&'a mut Role<'a>>,
+        class : Option<Class>,
+        pub roles : Vec<Box<Role>>,
     }
 
-    struct Role<'a> {
+    #[derive(Debug)]
+    pub enum Class {
+        Guardian,
+        Sentinel,
+        Sage,
+        Shadow,
+        Gunslinger,
+        Scoundrel,
+        Vanguard,
+        Trooper,
+        Juggernaut,
+        Marauder,
+        Sorceror,
+        Assassin,
+        Sniper,
+        Operative,
+        Powertech,
+        Mercenary,
+    }
+
+    #[derive(Default, Debug)]
+    pub struct Role {
         name    : String,
-        toon    : &'a Toon<'a>,
-        ear     : Option<Box<Equipment>>,
-        implant1: Option<Box<Equipment>>,
-        implant2: Option<Box<Equipment>>,
-        relic1  : Option<Box<Equipment>>,
-        relic2  : Option<Box<Equipment>>,
-        mh      : Option<Box<Equipment>>,
-        oh      : Option<Box<Equipment>>,
-        head    : Option<Box<Equipment>>,
-        chest   : Option<Box<Equipment>>,
-        hand    : Option<Box<Equipment>>,
-        legs    : Option<Box<Equipment>>,
-        feet    : Option<Box<Equipment>>,
-        bracer  : Option<Box<Equipment>>,
+        ear     : Option<Box<Cybernetics>>,
+        implant1: Option<Box<Cybernetics>>,
+        implant2: Option<Box<Cybernetics>>,
+        relic1  : Option<Box<Relic>>,
+        relic2  : Option<Box<Relic>>,
+        mh      : Option<Box<Weapon>>,
+        oh      : Option<Box<Weapon>>,
+        head    : Option<Box<Clothes>>,
+        chest   : Option<Box<Clothes>>,
+        hand    : Option<Box<Accessory>>,
+        legs    : Option<Box<Clothes>>,
+        feet    : Option<Box<Clothes>>,
+        bracer  : Option<Box<Accessory>>,
     }
 
-    enum Equipment {
-        Ear     {rating: i32, stat: String, augment: Augment},
-        Implant {rating: i32, stat: String, augment: Augment},
-        Relic   {rating: i32, augment: Augment},
-        MH      {main_slot: MainSlot, mod_slot: ModSlot, enhance_slot: i32,
-                 crystal: String, augment: Augment},
-        OH      {main_slot: MainSlot, mod_slot: ModSlot, enhance_slot: i32,
-                 crystal: String, augment: Augment},
-        Head    {main_slot: MainSlot, mod_slot: ModSlot, enhance_slot: i32,
-                 augment: Augment},
-        Chest   {main_slot: MainSlot, mod_slot: ModSlot, enhance_slot: i32,
-                 augment: Augment},
-        Hand    {main_slot: MainSlot, mod_slot: ModSlot, enhance_slot: i32,
-                 augment: Augment},
-        Belt    {main_slot: MainSlot, mod_slot: ModSlot, augment: Augment},
-        Legs    {main_slot: MainSlot, mod_slot: ModSlot, enhance_slot: i32,
-                 augment: Augment},
-        Feet    {main_slot: MainSlot, mod_slot: ModSlot, enhance_slot: i32,
-                 augment: Augment},
-        Bracer  {main_slot: MainSlot, mod_slot: ModSlot, augment: Augment},
+    #[derive(Default, Debug)]
+    pub struct Cybernetics {rating: i32, stat: String, augment: Option<Box<Augment>>}
+    #[derive(Default, Debug)]
+    pub struct Relic       {rating: i32, augment: Option<Box<Augment>>}
+    #[derive(Default, Debug)]
+    pub struct Weapon {
+        main_slot   : Option<Box<MainSlot>>,
+        mod_slot    : Option<Box<ModSlot>>,
+        enhance_slot: Option<Box<EnhanceSlot>>,
+        crystal     : Option<Box<Crystal>>,
+        augment     : Option<Box<Augment>>,
+    }
+    #[derive(Default, Debug)]
+    pub struct Clothes {
+        main_slot   : Option<Box<MainSlot>>,
+        mod_slot    : Option<Box<ModSlot>>,
+        enhance_slot: Option<Box<EnhanceSlot>>,
+        augment     : Option<Box<Augment>>,
+    }
+    #[derive(Default, Debug)]
+    pub struct Accessory {
+        main_slot   : Option<Box<MainSlot>>,
+        mod_slot    : Option<Box<ModSlot>>,
+        augment     : Option<Box<Augment>>,
+    }
+    #[derive(Default, Debug)]
+    pub struct Augment     {rating: i32, stat:String}
+    #[derive(Default, Debug)]
+    pub struct MainSlot    {rating: i32}
+    #[derive(Default, Debug)]
+    pub struct ModSlot     {rating: i32, letter: char}
+    #[derive(Default, Debug)]
+    pub struct EnhanceSlot {rating: i32, stat: String}
+    #[derive(Default, Debug)]
+    pub struct Crystal     {rating: i32, stat: String}
+
+//===========================================================================================
+// Traits
+//===========================================================================================
+
+    pub trait HasRating {
+        fn get_rating(&self) -> i32;
     }
 
-    struct Augment {
-        rating: i32,
-        stat  : String,
+    impl HasRating for Cybernetics { fn get_rating(&self) -> i32 {self.rating}}
+    impl HasRating for Relic       { fn get_rating(&self) -> i32 {self.rating}}
+    impl HasRating for Weapon {
+         fn get_rating(&self) -> i32 {
+             match self.main_slot {
+                 None     => 0i32,
+                 Some(ref num)=> num.rating,
+             }
+         }
+    }
+    impl HasRating for Clothes {
+        fn get_rating(&self) -> i32 {
+            match self.main_slot {
+                None     => 0i32,
+                Some(ref num)=> num.rating,
+            }
+        }
+    }
+    impl HasRating for Accessory {
+        fn get_rating(&self) -> i32 {
+            match self.main_slot {
+                None     => 0i32,
+                Some(ref num)=> num.rating,
+            }
+        }
     }
 
-    struct MainSlot {
+//===========================================================================================
+// Implementations
+//===========================================================================================
 
+    impl Player {
+        pub fn new(name: String) -> Player {
+            Player{ name: name, ..Default::default()}
+        }
+
+        pub fn add_toon(&mut self, toon: Toon) {
+            let x: Box<Toon> = Box::new(toon);
+            self.toons.push(x);
+        }
     }
 
-    struct ModSlot {
-
+    impl Toon {
+        pub fn new(name: String) -> Toon {
+            Toon {name: name, ..Default::default()}
+        }
     }
 
-    struct EnhanceSlot {
-
+    impl Role {
+        pub fn new(name: String) -> Role {
+            Role {name: name, ..Default::default()}
+        }
     }
+
+
+}
+mod query {
 
 }
