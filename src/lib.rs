@@ -1,3 +1,4 @@
+
 #[cfg(test)]
 mod tests {
     #[test]
@@ -8,6 +9,7 @@ mod tests {
 
 #[allow(dead_code)]
 pub mod structure {
+    use std::fmt;
 //===========================================================================================
 // pub structs
 //===========================================================================================
@@ -34,7 +36,7 @@ pub mod structure {
         Gunslinger,
         Scoundrel,
         Vanguard,
-        Trooper,
+        Commando,
         Juggernaut,
         Marauder,
         Sorceror,
@@ -107,6 +109,10 @@ pub mod structure {
         fn get_rating(&self) -> i32;
     }
 
+    pub trait Flexible {
+        fn update(&mut self);
+    }
+
     impl HasRating for Cybernetics { fn get_rating(&self) -> i32 {self.rating}}
     impl HasRating for Relic       { fn get_rating(&self) -> i32 {self.rating}}
     impl HasRating for Weapon {
@@ -131,6 +137,33 @@ pub mod structure {
                 None     => 0i32,
                 Some(ref num)=> num.rating,
             }
+        }
+    }
+
+    impl fmt::Display for Player {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            let mut buffer: String = format!("-{} \n  Toons:", self.name);
+            for name in &self.toons {
+                buffer = buffer + &format!("\n  {}", name );
+            }
+            write!(f,"{}",buffer)
+        }
+    }
+
+    impl fmt::Display for Toon {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            let mut buffer: String = format!("-{} \n  Level:{}
+            \n  Class:{:?}\n  Roles:", self.name,self.level,self.class);
+
+            for name in &self.roles {
+                buffer = buffer + &format!("\n\t{}", name);
+            }
+            write!(f,"{}",buffer)
+        }
+    }
+    impl fmt::Display for Role {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            write!(f,"{}", self.name)
         }
     }
 
